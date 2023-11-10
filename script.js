@@ -11,14 +11,12 @@ function generateRandomPolishWord(existingPasswords) {
   return password;
 }
 
-// Function to generate a random pair name
-function generateRandomPairName() {
-  const adjectives = ["Sperm Team", "Sprytne Babki", "#NWJczarodzieje", "Plażowy Wąż", "Tede zawał w wywiadzie", "Morenka", "TARCHO TERROR", "Fiut Kędziora", "508 008 000", "Łysy Chuj"];
-  const emojis = ["🌪️", "🚀", "🌈", "🎉", "🐉", "🔮", "🎭", "🎨", "🏅", "🛡️"];
-  const adjIndex = Math.floor(Math.random() * adjectives.length);
-  const emojiIndex = Math.floor(Math.random() * emojis.length);
-  return adjectives[adjIndex] + " " + emojis[emojiIndex];
-}
+// Pre-defined pair names
+const pairNames = [
+  "Sperm Team 🌪️", "Sprytne Babki 🚀", "#NWJczarodzieje 🌈", "Plażowy Wąż 🎉", 
+  "Tede zawał w wywiadzie 🐉", "Morenka 🔮", "TARCHO TERROR 🎭", "Fiut Kędziora 🎨", 
+  "508 008 000 🏅", "Łysy Chuj 🛡️"
+];
 
 // Function to generate slots
 function generateSlots() {
@@ -29,9 +27,9 @@ function generateSlots() {
     const slotPair = document.createElement('div');
     slotPair.className = 'slot-pair';
 
-    // Generate and display header for each pair
+    // Assign header for each pair
     const header = document.createElement('h3');
-    header.innerText = generateRandomPairName();
+    header.innerText = pairNames[i / 2 % pairNames.length];
     slotPair.appendChild(header);
 
     // Ensure unique password for each pair
