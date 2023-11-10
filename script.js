@@ -18,6 +18,36 @@ const pairNames = [
   "508 008 000 🏅", "Łysy Chuj 🛡️"
 ];
 
+// Function to fetch data from Google Sheets
+async function fetchDataFromSheet() {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbyAGtuSBAt_HSLQo8h4non2E8wh8Et6oj87d3hR_hwz-iSJkl5p4y9VILYcazeV5ICisw/exec', { method: 'GET' });
+  const data = await response.json();
+  // Process and display the data
+}
+
+// Function to post data to Google Sheets
+async function postDataToSheet(slot, name, preferences, password) {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbyAGtuSBAt_HSLQo8h4non2E8wh8Et6oj87d3hR_hwz-iSJkl5p4y9VILYcazeV5ICisw/exec', {
+    method: 'POST',
+    contentType: 'application/json',
+    body: JSON.stringify({ slot, name, preferences, password })
+  });
+  const result = await response.json();
+  // Handle the response
+}
+
+// Call fetchDataFromSheet when the page loads to update the UI
+window.onload = function() {
+  fetchDataFromSheet();
+  // ... rest of your onload code
+};
+
+// Update addParticipant function to post data
+function addParticipant(name, preferences, slotIndex, pairPassword) {
+  // ... existing code
+  postDataToSheet(slotIndex, name, preferences, pairPassword);
+}
+
 // Function to generate slots
 function generateSlots() {
   const slotsContainer = document.getElementById('slots-container');
