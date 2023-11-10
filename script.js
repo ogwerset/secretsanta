@@ -13,7 +13,7 @@ function generateRandomPolishWord(existingPasswords) {
 
 // Function to generate a random pair name
 function generateRandomPairName() {
-  const adjectives = ["Zacny", "Lotny", "Kosmiczny", "Wesoły", "Dziki", "Mistyczny", "Zagadkowy", "Fantastyczny", "Unikalny", "Odważny"];
+  const adjectives = ["Sperm Team", "Sprytne Babki", "#NWJczarodzieje", "Plażowy Wąż", "Tede zawał w wywiadzie", "Morenka", "TARCHO TERROR", "Fiut Kędziora", "508 008 000", "Łysy Chuj"];
   const emojis = ["🌪️", "🚀", "🌈", "🎉", "🐉", "🔮", "🎭", "🎨", "🏅", "🛡️"];
   const adjIndex = Math.floor(Math.random() * adjectives.length);
   const emojiIndex = Math.floor(Math.random() * emojis.length);
