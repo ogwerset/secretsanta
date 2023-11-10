@@ -1,24 +1,88 @@
 // Function to generate a random Polish word
-function generateRandomPolishWord() {
-  const adjectives = ["Ognisty", "Zwinny", "Niezapomniany", "Zabawny", "Szalony", "Magiczny", "Tajemniczy", "Niesamowity", "Wyjątkowy", "Dzielny"];
-  const nouns = ["Peja", "Gural", "Tede", "Hades", "Sokół", "Eldo", "Abradab", "Fokus", "O.S.T.R.", "Zeus"];
-  // Generate random indices for adjective and noun
-  const adjIndex = Math.floor(Math.random() * adjectives.length);
-  const nounIndex = Math.floor(Math.random() * nouns.length);
-  // Combine to create a password
-  return adjectives[adjIndex] + nouns[nounIndex];
+function generateRandomPolishWord(existingPasswords) {
+  const adjectives = ["masny","dospermiony", "dopierdolony", "swojski", "ciasny","polski","czarny","liryczny","dyskretny","spermastyczny"];
+  const nouns = ["tede","werset","detko","gural","grubson","pikej","majordomus","monako","maclaw","alvaro"];
+  let password;
+  do {
+    const adjIndex = Math.floor(Math.random() * adjectives.length);
+    const nounIndex = Math.floor(Math.random() * nouns.length);
+    password = adjectives[adjIndex] + nouns[nounIndex];
+  } while (existingPasswords.includes(password));
+  return password;
 }
 
 // Function to generate a random pair name
 function generateRandomPairName() {
   const adjectives = ["Zacny", "Lotny", "Kosmiczny", "Wesoły", "Dziki", "Mistyczny", "Zagadkowy", "Fantastyczny", "Unikalny", "Odważny"];
   const emojis = ["🌪️", "🚀", "🌈", "🎉", "🐉", "🔮", "🎭", "🎨", "🏅", "🛡️"];
-  // Generate random indices for adjective and emoji
   const adjIndex = Math.floor(Math.random() * adjectives.length);
   const emojiIndex = Math.floor(Math.random() * emojis.length);
-  // Combine to create a pair name
-  return adjectives[adjIndex] + " " + nouns[adjIndex] + " " + emojis[emojiIndex] + emojis[emojiIndex] + emojis[emojiIndex];
+  return adjectives[adjIndex] + " " + emojis[emojiIndex];
 }
+
+// Function to generate slots
+function generateSlots() {
+  const slotsContainer = document.getElementById('slots-container');
+  let slotPasswords = JSON.parse(localStorage.getItem('slotPasswords')) || [];
+  
+  for (let i = 0; i < participants.length; i += 2) {
+    const slotPair = document.createElement('div');
+    slotPair.className = 'slot-pair';
+
+    // Generate and display header for each pair
+    const header = document.createElement('h3');
+    header.innerText = generateRandomPairName();
+    slotPair.appendChild(header); // Make sure the header is appended to the slot pair
+
+    // Ensure unique password for each pair
+    if (!slotPasswords[i]) {
+      slotPasswords[i] = generateRandomPolishWord(slotPasswords);
+    }
+
+    for (let j = 0; j < 2; j++) {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.innerText = `ŻmudaMember ${i + j + 1}`;
+      slot.onclick = function() { selectSlot(i + j, slotPasswords[i]); };
+      slotPair.appendChild(slot);
+    }
+    slotsContainer.appendChild(slotPair); // Append the slot pair to the container
+  }
+  
+  localStorage.setItem('slotPasswords', JSON.stringify(slotPasswords));
+}
+
+// Function to select a slot
+function selectSlot(index, pairPassword) {
+  // Check if the slot is already taken
+  if (participants[index]) {
+    const enteredPassword = prompt('Wprowadź hasło dla swojej pary:');
+    if (enteredPassword && enteredPassword.toLowerCase() === pairPassword.toLowerCase()) {
+      // Show the participant's pair
+      const pairIndex = index % 2 === 0 ? index + 1 : index - 1;
+      let message = `Informacje o parze:\n`;
+      message += `Uczestnik ${index + 1}: ${participants[index].name}, Preferencje: ${participants[index].preferences}\n`;
+      if (participants[pairIndex]) {
+        message += `Uczestnik ${pairIndex + 1}: ${participants[pairIndex].name}, Preferencje: ${participants[pairIndex].preferences}`;
+      } else {
+        message += `Uczestnik ${pairIndex + 1} jeszcze się nie zarejestrował.`;
+      }
+      alert(message);
+    } else {
+      alert('Niestety, hasło jest nieprawidłowe!');
+    }
+  } else {
+    // If the slot is not taken, allow the user to register
+    const name = prompt('Wpisz swoją nazwę:');
+    if (!name) return;
+    const preferences = prompt('Co chcesz dostać? Te instrukcje zostaną wyświetlone osobie, która dołączy do twojej pary.');
+    if (!preferences) return;
+    addParticipant(name, preferences, index);
+    alert(`Twoje hasło to: ${pairPassword}. Zapamiętaj je!`);
+  }
+}
+
+// Remaining functions (addParticipant, updateSlots, closeInstructions, admin functionalities, window.onload) remain unchanged.
 
 // Array to hold the names of participants
 const participants = new Array(20).fill(null);
@@ -56,30 +120,38 @@ function generateSlots() {
 
 // Function to select a slot
 function selectSlot(index, pairPassword) {
-    // Check if the slot is already taken
-    if (participants[index]) {
-      const enteredPassword = prompt('Wprowadź hasło dla swojej pary:');
-      if (enteredPassword.toLowerCase() === pairPassword.toLowerCase()) {
-        // Show the participant's pair
-        const pairIndex = index % 2 === 0 ? index + 1 : index - 1;
-        if (participants[pairIndex]) {
-          alert(`Twój partner to: ${participants[pairIndex].name}`);
-        } else {
-          alert('Twój partner jeszcze się nie zarejestrował.');
-        }
+  // Check if the slot is already taken
+  if (participants[index]) {
+    const enteredPassword = prompt('Wprowadź hasło dla swojej pary:');
+    if (enteredPassword.toLowerCase() === pairPassword.toLowerCase()) {
+      // Show the participant's pair
+      const pairIndex = index % 2 === 0 ? index + 1 : index - 1;
+      let message = `Informacje o parze:\n`;
+
+      // Information about the current participant
+      message += `Uczestnik ${index + 1}: ${participants[index].name}, Preferencje: ${participants[index].preferences}\n`;
+
+      // Information about the paired participant
+      if (participants[pairIndex]) {
+        message += `Uczestnik ${pairIndex + 1}: ${participants[pairIndex].name}, Preferencje: ${participants[pairIndex].preferences}`;
       } else {
-        alert('Niestety, hasło jest nieprawidłowe!');
+        message += `Uczestnik ${pairIndex + 1} jeszcze się nie zarejestrował.`;
       }
+
+      alert(message);
     } else {
-      // If the slot is not taken, allow the user to register
-      const name = prompt('Podaj swoje imię:');
-      if (!name) return;
-      const preferences = prompt('Jakie są Twoje preferencje prezentowe?');
-      if (!preferences) return;
-      addParticipant(name, preferences, index);
-      alert(`Twoje hasło to: ${pairPassword}. Zapamiętaj je!`);
+      alert('Niestety, hasło jest nieprawidłowe!');
     }
+  } else {
+    // If the slot is not taken, allow the user to register
+    const name = prompt('Podaj swoje imię:');
+    if (!name) return;
+    const preferences = prompt('Jakie są Twoje preferencje prezentowe?');
+    if (!preferences) return;
+    addParticipant(name, preferences, index);
+    alert(`Twoje hasło to: ${pairPassword}. Zapamiętaj je!`);
   }
+}
   
 // Function to update slots
 function updateSlots() {
@@ -107,8 +179,18 @@ function adminLogin() {
   }
 }
 
+// Modified adminLogin function to include password view
+function adminLogin() {
+  const adminPassword = prompt('Wprowadź hasło admina:');
+  if (adminPassword === "DjSegment") {
+    adminPanel();
+  } else {
+    alert('Niestety, hasło jest nieprawidłowe!');
+  }
+}
+
 function adminPanel() {
-  const action = prompt('Co chcesz zrobić? (1) Usuń użytkownika (2) Zresetuj bazę danych');
+  const action = prompt('Co chcesz zrobić? (1) Usuń użytkownika (2) Zresetuj bazę danych (3) Pokaż hasła');
   switch (action) {
     case '1':
       const slotToRemove = prompt('Podaj numer slotu do usunięcia:');
