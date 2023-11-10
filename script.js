@@ -1,7 +1,7 @@
 // Function to generate a random Polish word
 function generateRandomPolishWord(existingPasswords) {
-  const adjectives = ["masny","dospermiony", "dopierdolony", "swojski", "ciasny","polski","czarny","liryczny","dyskretny","spermastyczny"];
-  const nouns = ["tede","werset","detko","gural","grubson","pikej","majordomus","monako","maclaw","alvaro"];
+  const adjectives = ["masny", "dospermiony", "dopierdolony", "swojski", "ciasny", "polski", "czarny", "liryczny", "dyskretny", "spermastyczny"];
+  const nouns = ["tede", "werset", "detko", "gural", "grubson", "pikej", "majordomus", "monako", "maclaw", "alvaro"];
   let password;
   do {
     const adjIndex = Math.floor(Math.random() * adjectives.length);
@@ -25,14 +25,14 @@ function generateSlots() {
   const slotsContainer = document.getElementById('slots-container');
   let slotPasswords = JSON.parse(localStorage.getItem('slotPasswords')) || [];
   
-  for (let i = 0; i < participants.length; i += 2) {
+  for (let i = 0; i < 20; i += 2) {
     const slotPair = document.createElement('div');
     slotPair.className = 'slot-pair';
 
     // Generate and display header for each pair
     const header = document.createElement('h3');
     header.innerText = generateRandomPairName();
-    slotPair.appendChild(header); // Make sure the header is appended to the slot pair
+    slotPair.appendChild(header);
 
     // Ensure unique password for each pair
     if (!slotPasswords[i]) {
@@ -46,7 +46,7 @@ function generateSlots() {
       slot.onclick = function() { selectSlot(i + j, slotPasswords[i]); };
       slotPair.appendChild(slot);
     }
-    slotsContainer.appendChild(slotPair); // Append the slot pair to the container
+    slotsContainer.appendChild(slotPair);
   }
   
   localStorage.setItem('slotPasswords', JSON.stringify(slotPasswords));
@@ -94,65 +94,6 @@ function addParticipant(name, preferences, slotIndex) {
   localStorage.setItem('participants', JSON.stringify(participants));
 }
 
-// Function to generate slots
-function generateSlots() {
-  const slotsContainer = document.getElementById('slots-container');
-  const slotPasswords = JSON.parse(localStorage.getItem('slotPasswords')) || {};
-  
-  for (let i = 0; i < participants.length; i += 2) {
-    const slotPair = document.createElement('div');
-    slotPair.className = 'slot-pair';
-    const pairPassword = slotPasswords[i] || generateRandomPolishWord();
-    slotPasswords[i] = pairPassword; // Save or retrieve the password for the pair
-
-    for (let j = 0; j < 2; j++) {
-      const slot = document.createElement('div');
-      slot.className = 'slot';
-      slot.innerText = `ŻmudaMember ${i + j + 1}`;
-      slot.onclick = function() { selectSlot(i + j, pairPassword); };
-      slotPair.appendChild(slot);
-    }
-    slotsContainer.appendChild(slotPair);
-  }
-  
-  localStorage.setItem('slotPasswords', JSON.stringify(slotPasswords));
-}
-
-// Function to select a slot
-function selectSlot(index, pairPassword) {
-  // Check if the slot is already taken
-  if (participants[index]) {
-    const enteredPassword = prompt('Wprowadź hasło dla swojej pary:');
-    if (enteredPassword.toLowerCase() === pairPassword.toLowerCase()) {
-      // Show the participant's pair
-      const pairIndex = index % 2 === 0 ? index + 1 : index - 1;
-      let message = `Informacje o parze:\n`;
-
-      // Information about the current participant
-      message += `Uczestnik ${index + 1}: ${participants[index].name}, Preferencje: ${participants[index].preferences}\n`;
-
-      // Information about the paired participant
-      if (participants[pairIndex]) {
-        message += `Uczestnik ${pairIndex + 1}: ${participants[pairIndex].name}, Preferencje: ${participants[pairIndex].preferences}`;
-      } else {
-        message += `Uczestnik ${pairIndex + 1} jeszcze się nie zarejestrował.`;
-      }
-
-      alert(message);
-    } else {
-      alert('Niestety, hasło jest nieprawidłowe!');
-    }
-  } else {
-    // If the slot is not taken, allow the user to register
-    const name = prompt('Podaj swoje imię:');
-    if (!name) return;
-    const preferences = prompt('Jakie są Twoje preferencje prezentowe?');
-    if (!preferences) return;
-    addParticipant(name, preferences, index);
-    alert(`Twoje hasło to: ${pairPassword}. Zapamiętaj je!`);
-  }
-}
-  
 // Function to update slots
 function updateSlots() {
   const slots = document.getElementsByClassName('slot');
@@ -179,16 +120,6 @@ function adminLogin() {
   }
 }
 
-// Modified adminLogin function to include password view
-function adminLogin() {
-  const adminPassword = prompt('Wprowadź hasło admina:');
-  if (adminPassword === "DjSegment") {
-    adminPanel();
-  } else {
-    alert('Niestety, hasło jest nieprawidłowe!');
-  }
-}
-
 function adminPanel() {
   const action = prompt('Co chcesz zrobić? (1) Usuń użytkownika (2) Zresetuj bazę danych (3) Pokaż hasła');
   switch (action) {
@@ -200,6 +131,9 @@ function adminPanel() {
       if (confirm('Czy na pewno chcesz zresetować całą bazę danych?')) {
         resetDatabase();
       }
+      break;
+    case '3':
+      showPasswords();
       break;
     default:
       alert('Nieprawidłowa akcja.');
@@ -223,6 +157,17 @@ function resetDatabase() {
   participants.fill(null);
   updateSlots();
   alert('Baza danych została zresetowana.');
+}
+
+function showPasswords() {
+  const slotPasswords = JSON.parse(localStorage.getItem('slotPasswords')) || [];
+  let message = 'Hasła dla par:\n';
+  slotPasswords.forEach((password, index) => {
+    if (password) {
+      message += `Para ${index + 1}: ${password}\n`;
+    }
+  });
+  alert(message);
 }
 
 // Add the admin button to the bottom of the page
