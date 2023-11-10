@@ -44,7 +44,7 @@ function generateSlots() {
     for (let j = 0; j < 2; j++) {
       const slot = document.createElement('div');
       slot.className = 'slot';
-      slot.innerText = `Slot ${i + j + 1}`;
+      slot.innerText = `ŻmudaMember ${i + j + 1}`;
       slot.onclick = function() { selectSlot(i + j, pairPassword); };
       slotPair.appendChild(slot);
     }
