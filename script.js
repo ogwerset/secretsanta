@@ -18,35 +18,41 @@ const pairNames = [
   "508 008 000 🏅", "Łysy Chuj 🛡️"
 ];
 
-// Function to fetch data from Google Sheets
-async function fetchDataFromSheet() {
-  const response = await fetch('https://script.google.com/macros/s/AKfycbyAGtuSBAt_HSLQo8h4non2E8wh8Et6oj87d3hR_hwz-iSJkl5p4y9VILYcazeV5ICisw/exec', { method: 'GET' });
-  const data = await response.json();
-  // Process and display the data
+document.addEventListener('DOMContentLoaded', function() {
+  fetchParticipantsAndUpdateSlots();
+});
+
+function fetchParticipantsAndUpdateSlots() {
+  axios.get('https://secretsanta-qlggeq5ep-ogwersets-projects.vercel.app/api/participants')
+      .then(function (response) {
+          updateSlotsVisibility(response.data);
+      })
+      .catch(function (error) {
+          console.error('Error fetching participants:', error);
+      });
 }
 
-// Function to post data to Google Sheets
-async function postDataToSheet(slot, name, preferences, password) {
-  const response = await fetch('https://script.google.com/macros/s/AKfycbyAGtuSBAt_HSLQo8h4non2E8wh8Et6oj87d3hR_hwz-iSJkl5p4y9VILYcazeV5ICisw/exec', {
-    method: 'POST',
-    contentType: 'application/json',
-    body: JSON.stringify({ slot, name, preferences, password })
-  });
-  const result = await response.json();
-  // Handle the response
+function updateSlotsVisibility(participants) {
+  // Assuming you have 20 slots and they have IDs like 'slot-1', 'slot-2', etc.
+  for (let i = 1; i <= 20; i++) {
+      const slotElement = document.getElementById(`slot-${i}`);
+      if (slotElement) {
+          const isTaken = participants.some(participant => participant.slot === i);
+          if (isTaken) {
+              slotElement.classList.add('blurred'); // Add your class to blur the slot
+          } else {
+              slotElement.classList.remove('blurred'); // Remove the class if the slot is not taken
+          }
+      }
+  }
 }
 
-// Call fetchDataFromSheet when the page loads to update the UI
-window.onload = function() {
-  fetchDataFromSheet();
-  // ... rest of your onload code
-};
+// Rest of your existing script.js code...
 
-// Update addParticipant function to post data
-function addParticipant(name, preferences, slotIndex, pairPassword) {
-  // ... existing code
-  postDataToSheet(slotIndex, name, preferences, pairPassword);
-}
+
+// Example usage of addParticipant
+// addParticipant({ name: 'John Doe', preferences: 'Books', slot: 1 });
+
 
 // Function to generate slots
 function generateSlots() {
