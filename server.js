@@ -1,7 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+
+
+const cors = require('cors');
+app.use(cors());
+
+
 
 // MongoDB Atlas connection string
 const mongoDBAtlasConnectionString = 'mongodb+srv://Cluster23376:Kupasmierdzi1@secretsanta.8bfzhm1.mongodb.net/?retryWrites=true&w=majority';
@@ -39,7 +45,7 @@ app.post('/api/participants', async (req, res) => {
     res.status(400).send(error.message);
   }
 });
-
+``
 
 // Define your routes and middleware here
 
